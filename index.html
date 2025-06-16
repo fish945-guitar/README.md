@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AAC App</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #f0f0f0; }
+    .grid { display: grid; gap: 10px; padding: 10px; }
+    .grid-1x3 { grid-template-columns: 1fr; grid-template-rows: repeat(3, 1fr); }
+    .grid-2x4 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); }
+    .cell {
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 120px;
+      transition: box-shadow 0.2s ease-in-out, transform 0.1s ease-in-out;
+    }
+    .cell:hover {
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      transform: scale(1.03);
+    }
+    .cell:active {
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      transform: scale(0.97);
+    }
+    .cell img {
+      max-width: 100%;
+      max-height: 60px;
+      object-fit: contain;
+    }
+    .cell span {
+      padding: 5px;
+      font-size: 30px;
+      text-align: center;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid" id="page"></div>
+  <script>
+    const pages = {
+      home: ["location", "food", "feeling"],
+      location: ["I want go", "park", "hospital", "MRT", "train station", "shopping mall", "restaurant", "back"],
+      food: ["I want eat", "I want drink", "noodles", "rice", "dumpling", "soup", "water", "back"],
+      feeling: ["I feel", "happy", "angry", "nervous", "sad", "hot", "cold", "back"]
+    };
+
+    const zhText = {
+      "location": "地點",
+      "food": "食物",
+      "feeling": "感受",
+      "I want go": "我要去",
+      "park": "公園",
+      "hospital": "醫院",
+      "MRT": "捷運",
+      "train station": "火車站",
+      "shopping mall": "百貨公司",
+      "restaurant": "餐廳",
+      "back": "回首頁",
+      "I want eat": "我想吃",
+      "I want drink": "我想喝",
+      "noodles": "麵",
+      "rice": "飯",
+      "dumpling": "水餃",
+      "soup": "湯",
+      "water": "水",
+      "I feel": "我覺得",
+      "happy": "開心",
+      "angry": "生氣",
+      "nervous": "緊張",
+      "sad": "難過",
+      "hot": "熱",
+      "cold": "冷"
+    };
+
+    const pageName = new URLSearchParams(window.location.search).get('p') || 'home';
+    const pageItems = pages[pageName];
+    const container = document.getElementById('page');
+    container.classList.add(pageName === 'home' ? 'grid-1x3' : 'grid-2x4');
+
+    pageItems.forEach(item => {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      const cleanedItem = item.trim();
+      const label = zhText[cleanedItem] || cleanedItem;
+      const fileName = cleanedItem.replace(/ /g, '_');
+
+      if (pageName === 'home') {
+        cell.innerHTML = `<a href="?p=${fileName}" onclick="playSound('${fileName}')"><img src="./pic/${fileName}.png" alt="${label}" /><span>${label}</span></a>`;
+      } else if (cleanedItem.toLowerCase() === 'back') {
+        cell.innerHTML = `<a href="?p=home" onclick="playSound('${fileName}')"><img src="./pic/${fileName}.png" alt="${label}" /><span>${label}</span></a>`;
+      } else {
+        cell.innerHTML = `<div onclick="playSound('${fileName}')"><img src="./pic/${fileName}.png" alt="${label}" /><span>${label}</span></div>`;
+      }
+
+      container.appendChild(cell);
+    });
+
+    function playSound(name) {
+      const audio = new Audio(`./wav/${name}.wav`);
+      audio.play();
+    }
+  </script>
+</body>
+</html>
